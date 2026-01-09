@@ -1,16 +1,14 @@
-import re
 import os
-from aiogram import Bot, Dispatcher, executor, types
+import re
+import telebot
 
 BOT_TOKEN = os.getenv("BOT_TOKEN")
-
-bot = Bot(token=BOT_TOKEN)
-dp = Dispatcher(bot)
+bot = telebot.TeleBot(BOT_TOKEN)
 
 INSTAGRAM_REGEX = re.compile(r'(https?://)?(www\.)?instagram\.com/\S+')
 
-@dp.message_handler()
-async def handle_message(message: types.Message):
+@bot.message_handler(func=lambda message: True)
+def handle_message(message):
     text = message.text or ""
     match = INSTAGRAM_REGEX.search(text)
 
@@ -26,7 +24,7 @@ async def handle_message(message: types.Message):
         .replace("www.", "kk")
     )
 
-    await message.reply(converted)
+    bot.reply_to(message, converted)
 
 if __name__ == "__main__":
-    executor.start_polling(dp, skip_updates=True)
+    bot.infinity_polling(skip_pending=True)
